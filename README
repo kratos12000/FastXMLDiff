@@ -1,0 +1,4 @@
+This project was created as a functional tool for the comparison and editing of XML documents.
+It is a work in progress, designed to read in two XML documents and compare them in a format
+similar to "diff". It marks when nodes have been added, deleted or modified by adding new
+attributes to element nodes. This project was created by Matthew Gaines and Amanda Buckley.
