@@ -41,10 +41,110 @@ QDomDocument Parser::Comp_XML(QNode old_doc, QNode new_doc)
 	QDomNode * old_child = old_doc;
 	QDomNode * new_child = new_doc;
 	QDomComment added, removed, modified;
+	QDomDocument retDoc;
 	added = "Node Added";
 	removed = "Node Deleted";
 	modified = "Node Changed";
+	
+        if(length(childNodes(new_child)) == length(childNodes(old_child)))
+	{
+		if(isNull(firstChild(new_child)) != true)
+		{
+			if(nodeValue(firstChild(new_child)) != nodeValue(firstChild(old_child)))
+			{
+				//Set attribute to modified.
+			}
+			Comp_XML(firstChild(old_child), firstChild(new_child));
+		
+			int nodeLen = length(childNodes(new_child));
+			new_child = firstChild(new_child);
+			old_child = firstChild(old_child);
+			for(int x = (nodeLen-1); x>0; x--)
+			{
+				if(nodeValue(nextSibling(new_child)) != nodeValue(nextSibling(old_child)))
+                        	{
+                        	        //Set attribute to modified.
+                        	}
+				Comp_XML(old_child, new_child);
+				new_child = nextSibling(new_child);
+				old_child = nextSibling(old_child);
+			}
+		}
+	}
+	
+	old_child = old_doc;
+	new_child = new_doc;
 
+	if(length(childNodes(new_child)) != length(childNodes(old_child)))
+	{
+		if(length(childNodes(new_child)) > length(childNodes(old_child)))
+		{
+			if(isNull(firstChild(old_child)) != true)
+			{
+				if(nodeValue(firstChild(new_child)) != nodeValue(firstChild(old_child)))
+				{
+					//Set attribute to modified.
+				}
+				Comp_XML(firstChild(old_child), firstChild(new_child));
+				
+				int nodeLen = length(childNodes(new_child));
+				new_child = firstChild(new_child);
+				old_child = firstChild(old_child);
+				for(int x = (nodeLen-1); x>0; x--)
+				{
+					if(isNull(nextSibling(old_child)) == true)
+					{
+						//Set attribute to added.
+					}
+					else if(nodeValue(nextSibling(new_child)) != nodeValue(nextSibling(old_child)))
+					{
+						//Set attribute to modified.
+					}
+					Comp_XML(old_child,new_child);
+					new_child = nextSibling(new_child);
+					old_child = nextSibling(old_child);
+				}
+
+			}
+		}
+	
+	
+		else
+		{
+	
+                        if(isNull(firstChild(new_child)) != true)
+                        {
+                                if(nodeValue(firstChild(old_child)) != nodeValue(firstChild(new_child)))
+                                {
+                                        //Set attribute to modified.
+                                }
+                                Comp_XML(firstChild(old_child), firstChild(new_child));
+
+                                int nodeLen = length(childNodes(old_child));
+                                new_child = firstChild(new_child);
+                                old_child = firstChild(old_child);
+                                for(int x = (nodeLen-1); x>0; x--)
+                                {
+                                        if(isNull(nextSibling(new_child)) == true)
+                                        {
+                                                //Set attribute to deleted.
+                                        }
+                                        else if(nodeValue(nextSibling(old_child)) != nodeValue(nextSibling(new_child)))
+                                        {
+                                                //Set attribute to modified.
+                                        }
+                                        Comp_XML(old_child,new_child);
+                                        new_child = nextSibling(new_child);
+                                        old_child = nextSibling(old_child);
+                                }
+
+                        }
+                }
+	}
+	retDoc = //The "new" node tree with the annotation elements.
+	return retDoc;
+
+/*
 	while (old_child->hasChild() == true)
 	{
 
@@ -71,9 +171,5 @@ QDomDocument Parser::Comp_XML(QNode old_doc, QNode new_doc)
 	{
 		new_child->appendChild(modified);
 	}
-	
-	
-
-
-//childNodes() function and length() function
+*/	
 }
