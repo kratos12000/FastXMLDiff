@@ -11,6 +11,6 @@ class Parser : public QDialog
 
 	public:
 		int Read_XML(QString old_path, QString new_path);
-		QDomNode Comp_XML(QDomNode* old_doc, QDomNode* new_doc);
+		void Comp_XML(QDomNode old_node, QDomNode new_node, QDomNode* ret_node);
 
 };

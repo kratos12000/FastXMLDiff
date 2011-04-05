@@ -2,6 +2,7 @@
 #include <QtXml>
 #include <iostream>
 #include "Parser.h"
+
 using namespace std;
 
 int Parser::Read_XML(QString old_path, QString new_path)
@@ -31,145 +32,60 @@ int Parser::Read_XML(QString old_path, QString new_path)
                 }
 	new_file.close();
 
-	Parser::Comp_XML(&old_doc, &new_doc);
+	QDomDocument* ret_doc;
+	Parser::Comp_XML(old_doc, new_doc, ret_doc);
+	
+	cout << ret_doc->toString().constData();
 
 	return 0;	
 }
 
-QDomNode Parser::Comp_XML(QDomNode* old_doc, QDomNode* new_doc)
+void Parser::Comp_XML(QDomNode old_node, QDomNode new_node, QDomNode* ret_node)
 {
-	QDomNode old_child = *old_doc;
-	QDomNode new_child = *new_doc;
-	QDomComment added, removed, modified;
-	QDomDocument retDoc;
-	added = "Node Added";
-	removed = "Node Deleted";
-	modified = "Node Changed";
-	
-        if(length(childNodes(new_child)) == length(childNodes(old_child)))
-	{
-		if(isNull(firstChild(new_child)) != true)
-		{
-			if(nodeValue(firstChild(new_child)) != nodeValue(firstChild(old_child)))
-			{
-				//Set attribute to modified.
-			}
-			Comp_XML(firstChild(old_child), firstChild(new_child));
-		
-			int nodeLen = length(childNodes(new_child));
-			new_child = firstChild(new_child);
-			old_child = firstChild(old_child);
-			for(int x = (nodeLen-1); x>0; x--)
-			{
-				if(nodeValue(nextSibling(new_child)) != nodeValue(nextSibling(old_child)))
-                        	{
-                        	        //Set attribute to modified.
-                        	}
-				Comp_XML(old_child, new_child);
-				new_child = nextSibling(new_child);
-				old_child = nextSibling(old_child);
-			}
-		}
+	int old_length, new_length, max_length;
+	old_length = old_node.childNodes().length();
+	new_length = new_node.childNodes().length();
+
+	if (old_length < new_length)
+		max_length = new_length;
+	else
+		max_length = old_length;
+
+	if (max_length == 0){
+		return;
 	}
-	
-	old_child = old_doc;
-	new_child = new_doc;
 
-	if(length(childNodes(new_child)) != length(childNodes(old_child)))
-	{
-		if(length(childNodes(new_child)) > length(childNodes(old_child)))
-		{
-			if(isNull(firstChild(old_child)) != true)
-			{
-				if(nodeValue(firstChild(new_child)) != nodeValue(firstChild(old_child)))
-				{
-					//Set attribute to modified.
-				}
-				Comp_XML(firstChild(old_child), firstChild(new_child));
-				
-				int nodeLen = length(childNodes(new_child));
-				new_child = firstChild(new_child);
-				old_child = firstChild(old_child);
-				for(int x = (nodeLen-1); x>0; x--)
-				{
-					if(isNull(nextSibling(old_child)) == true)
-					{
-						//Set attribute to added.
-					}
-					else if(nodeValue(nextSibling(new_child)) != nodeValue(nextSibling(old_child)))
-					{
-						//Set attribute to modified.
-					}
-					Comp_XML(old_child,new_child);
-					new_child = nextSibling(new_child);
-					old_child = nextSibling(old_child);
-				}
+	ret_node = new QDomElement();
 
+	for (int i=0; i < max_length; i++){
+		QDomElement* child_element;
+		if (i>=old_length){
+			QDomNode* child_node = new QDomNode;
+			*child_node = new_node.childNodes().item(i).cloneNode(true);
+			child_element = static_cast<QDomElement*>(child_node);
+			if (!child_element){
+				child_element = new QDomElement();
+				child_element->appendChild(*child_node);
+			}
+			child_element->setAttribute("added", true);
+		}
+		else if (i>= new_length){
+			QDomNode* child_node = new QDomNode;
+			*child_node = old_node.childNodes().item(i).cloneNode(true);
+			child_element = static_cast<QDomElement*>(child_node);
+			if (!child_element){
+				child_element = new QDomElement();
+				child_element->appendChild(*child_node);
+			}				
+			child_element->setAttribute("removed", true);
+		}
+		else{
+			child_element = new QDomElement();
+			Comp_XML(old_node.childNodes().item(i), new_node.childNodes().item(i), (QDomNode*)child_element);
+			if (old_node.childNodes().item(i).nodeValue() != new_node.childNodes().item(i).nodeValue()){
+				child_element->setAttribute("modified", true);
 			}
 		}
-	
-	
-		else
-		{
-	
-                        if(isNull(firstChild(new_child)) != true)
-                        {
-                                if(nodeValue(firstChild(old_child)) != nodeValue(firstChild(new_child)))
-                                {
-                                        //Set attribute to modified.
-                                }
-                                Comp_XML(firstChild(old_child), firstChild(new_child));
-
-                                int nodeLen = length(childNodes(old_child));
-                                new_child = firstChild(new_child);
-                                old_child = firstChild(old_child);
-                                for(int x = (nodeLen-1); x>0; x--)
-                                {
-                                        if(isNull(nextSibling(new_child)) == true)
-                                        {
-                                                //Set attribute to deleted.
-                                        }
-                                        else if(nodeValue(nextSibling(old_child)) != nodeValue(nextSibling(new_child)))
-                                        {
-                                                //Set attribute to modified.
-                                        }
-                                        Comp_XML(old_child,new_child);
-                                        new_child = nextSibling(new_child);
-                                        old_child = nextSibling(old_child);
-                                }
-
-                        }
-                }
+		ret_node->appendChild(*child_element);
 	}
-	retDoc = //The "new" node tree with the annotation elements.
-	return retDoc;
-
-/*
-	while (old_child->hasChild() == true)
-	{
-
-		if(old_child.hasChildNodes() == true && new_child.hasChildNodes() == true) //If both nodes have children.
-		{
-			old_child = old_child.firstChild();
-			new_child = new_child.firstChild();
-		}
-		
-		else if(new_child.hasChildNodes() == false) //If the old_child has children and new_child doesn't.
-		{
-			new_child.appendChild(removed); //Append a removed node, then set the next children to be the current nodes.
-			old_child = old_child.firstChild();
-			new_child = new_child.firstChild();
-		}
-	}
-
-	if(new_child.hasChildNodes() == true) //If new_child has more children.
-	{
-		new_child.appendChild(added); //Append an added node to the current child.
-	}
-
-	else if(old_child.nodeValue() != new_child.nodeValue()) //If the two have different contents.
-	{
-		new_child.appendChild(modified);
-	}
-*/	
 }
