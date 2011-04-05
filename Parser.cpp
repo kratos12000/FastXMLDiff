@@ -32,15 +32,19 @@ int Parser::Read_XML(QString old_path, QString new_path)
                 }
 	new_file.close();
 
-	QDomDocument* ret_doc;
-	Parser::Comp_XML(old_doc, new_doc, ret_doc);
+	QDomDocument ret_doc;
+	QDomElement ret_node = ret_doc.createElement("root");
+	ret_doc.appendChild(ret_node);
 	
-	cout << ret_doc->toString().constData();
+	Parser::Comp_XML(old_doc, new_doc, ret_doc, ret_node);
+
+	QString diffdoc = ret_doc.toString();	
+	cout << qPrintable(diffdoc) << endl;
 
 	return 0;	
 }
 
-void Parser::Comp_XML(QDomNode old_node, QDomNode new_node, QDomNode* ret_node)
+void Parser::Comp_XML(QDomNode old_node, QDomNode new_node, QDomDocument ret_doc, QDomNode ret_node)
 {
 	int old_length, new_length, max_length;
 	old_length = old_node.childNodes().length();
@@ -51,41 +55,44 @@ void Parser::Comp_XML(QDomNode old_node, QDomNode new_node, QDomNode* ret_node)
 	else
 		max_length = old_length;
 
-	if (max_length == 0){
-		return;
-	}
-
-	ret_node = new QDomElement();
+	qDebug() << "Comparing " << old_node.nodeName() << ":" << old_node.nodeValue() << " and " << new_node.nodeName() << ":" 
+		<< new_node.nodeValue() << endl;
 
 	for (int i=0; i < max_length; i++){
-		QDomElement* child_element;
+		QDomElement child_element;
 		if (i>=old_length){
-			QDomNode* child_node = new QDomNode;
-			*child_node = new_node.childNodes().item(i).cloneNode(true);
-			child_element = static_cast<QDomElement*>(child_node);
-			if (!child_element){
-				child_element = new QDomElement();
-				child_element->appendChild(*child_node);
+			QDomNode child_node = new_node.childNodes().item(i);
+			child_element = child_node.cloneNode(true).toElement();
+			if (child_element.isNull()){
+				child_element = ret_doc.createElement("container");
+				child_element.appendChild(child_node.cloneNode(true));
 			}
-			child_element->setAttribute("added", true);
+			child_element.setAttribute("added", true);
 		}
 		else if (i>= new_length){
-			QDomNode* child_node = new QDomNode;
-			*child_node = old_node.childNodes().item(i).cloneNode(true);
-			child_element = static_cast<QDomElement*>(child_node);
-			if (!child_element){
-				child_element = new QDomElement();
-				child_element->appendChild(*child_node);
-			}				
-			child_element->setAttribute("removed", true);
+			QDomNode child_node = old_node.childNodes().item(i);
+			child_element = child_node.cloneNode(true).toElement();
+			if (child_element.isNull()){
+				child_element = ret_doc.createElement("container");
+				child_element.appendChild(child_node.cloneNode(true));
+			}
+			child_element.setAttribute("removed", true);
 		}
 		else{
-			child_element = new QDomElement();
-			Comp_XML(old_node.childNodes().item(i), new_node.childNodes().item(i), (QDomNode*)child_element);
-			if (old_node.childNodes().item(i).nodeValue() != new_node.childNodes().item(i).nodeValue()){
-				child_element->setAttribute("modified", true);
+			QDomNode child_node = old_node.childNodes().item(i);
+			child_element = child_node.toElement();
+			if (!child_element.isNull()){
+				child_element = ret_doc.createElement(child_element.tagName());
+			} 
+			else{
+				//TODO: Handle processing-instructions, comments, perhaps non-text-entities.
+				child_element = ret_doc.createElement("entity-replacement");
+			}	
+			Comp_XML(old_node.childNodes().item(i), new_node.childNodes().item(i), ret_doc, child_element);
+			if (child_node.nodeValue() != new_node.childNodes().item(i).nodeValue()){
+				child_element.setAttribute("modified", true);
 			}
 		}
-		ret_node->appendChild(*child_element);
+		ret_node.appendChild(child_element);
 	}
 }
