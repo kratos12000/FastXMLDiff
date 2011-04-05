@@ -31,15 +31,15 @@ int Parser::Read_XML(QString old_path, QString new_path)
                 }
 	new_file.close();
 
-	Parser::Comp_XML(old_doc, new_doc);
+	Parser::Comp_XML(&old_doc, &new_doc);
 
 	return 0;	
 }
 
-QDomDocument Parser::Comp_XML(QNode old_doc, QNode new_doc)
+QDomNode Parser::Comp_XML(QDomNode* old_doc, QDomNode* new_doc)
 {
-	QDomNode * old_child = old_doc;
-	QDomNode * new_child = new_doc;
+	QDomNode old_child = *old_doc;
+	QDomNode new_child = *new_doc;
 	QDomComment added, removed, modified;
 	QDomDocument retDoc;
 	added = "Node Added";
@@ -148,28 +148,28 @@ QDomDocument Parser::Comp_XML(QNode old_doc, QNode new_doc)
 	while (old_child->hasChild() == true)
 	{
 
-		if(old_child->hasChild() == true && new_child->hasChild() == true) //If both nodes have children.
+		if(old_child.hasChildNodes() == true && new_child.hasChildNodes() == true) //If both nodes have children.
 		{
-			old_child = old_child->firstChild();
-			new_child = new_child->firstChild();
+			old_child = old_child.firstChild();
+			new_child = new_child.firstChild();
 		}
 		
-		else if(new_child->hasChild() == false) //If the old_child has children and new_child doesn't.
+		else if(new_child.hasChildNodes() == false) //If the old_child has children and new_child doesn't.
 		{
-			new_child->appendChild(removed); //Append a removed node, then set the next children to be the current nodes.
-			old_child = old_child->firstChild();
-			new_child = new_child->firstChild();
+			new_child.appendChild(removed); //Append a removed node, then set the next children to be the current nodes.
+			old_child = old_child.firstChild();
+			new_child = new_child.firstChild();
 		}
 	}
 
-	if(new_child->hasChild() == true) //If new_child has more children.
+	if(new_child.hasChildNodes() == true) //If new_child has more children.
 	{
-		new_child->appendChild(added); //Append an added node to the current child.
+		new_child.appendChild(added); //Append an added node to the current child.
 	}
 
-	else if(old_child->nodeValue() != new_child->nodeValue()) //If the two have different contents.
+	else if(old_child.nodeValue() != new_child.nodeValue()) //If the two have different contents.
 	{
-		new_child->appendChild(modified);
+		new_child.appendChild(modified);
 	}
 */	
 }
