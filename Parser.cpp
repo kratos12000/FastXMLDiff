@@ -5,7 +5,7 @@
 
 using namespace std;
 
-int Parser::Read_XML(QString old_path, QString new_path)
+int Parser::Read_XML(QString old_path, QString new_path, QString filePath)
 {
 	QFile old_file(old_path);
         	if (!old_file.open(QIODevice::ReadOnly)){
@@ -38,10 +38,20 @@ int Parser::Read_XML(QString old_path, QString new_path)
 	
 	Parser::Comp_XML(old_doc, new_doc, ret_doc, ret_node);
 
-	QString diffdoc = ret_doc.toString();	
-	cout << qPrintable(diffdoc) << endl;
+	QFile diffed_file(filePath); //Create a new XML file for the custom deck.
+        if (!diffed_file.open(QIODevice::WriteOnly | QFile::Truncate)){
+                QMessageBox::warning(this, "ERROR:", QString("Could not open file ") + filePath + " for writing.");
+                return -1;
+        }
 
-	return 0;	
+	QTextStream out(&diffed_file);
+
+	QString diffdoc = ret_doc.toString();	
+	out << qPrintable(diffdoc) << endl;
+
+	diffed_file.close();
+
+	return 1;	
 }
 
 void Parser::Comp_XML(QDomNode old_node, QDomNode new_node, QDomDocument ret_doc, QDomNode ret_node)

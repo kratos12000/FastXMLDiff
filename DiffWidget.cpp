@@ -112,13 +112,15 @@ void DiffWidget::getNewPath()
 void DiffWidget::applyButtonPressed()
 {
 	QString OldPath = browseLineEditOld->text();
-	QString NewPath = browseLineEditOld->text();
+	QString NewPath = browseLineEditNew->text();
+	QString fileName = nameLineEdit->text();
 
-	m_parser->Read_XML(OldPath, NewPath);
-
-	QMessageBox::information(this,"Task Completed",
-	QString("The XML diff file of ") + browseLineEditOld->text() + " and " + browseLineEditNew->text() +
-	 " has been successfully completed.\n The file has been stored as:  " + nameLineEdit->text() + ".");
+	if(m_parser->Read_XML(OldPath, NewPath, fileName) > 0)
+	{
+		QMessageBox::information(this,"Task Completed",
+		QString("The XML diff file of ") + browseLineEditOld->text() + " and " + browseLineEditNew->text() +
+		 " has been successfully completed.\n The file has been stored as:  " + nameLineEdit->text() + ".");
+	}
 }
 
 void DiffWidget::cancelButtonPressed()
