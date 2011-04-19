@@ -212,6 +212,11 @@ void Parser::Comp_XML(QDomNode old_node, QDomNode new_node, QDomDocument ret_doc
 				else {
 					child_node = ret_doc.createElement(old_element.tagName());
 					child_element = child_node.toElement();
+					QDomNamedNodeMap attributes = old_element.attributes();
+					for (unsigned int i=0;i<attributes.length();i++){
+						QDomAttr attribute = attributes.item(i).toAttr();
+						child_element.setAttribute(attribute.name(), attribute.value());
+					}
 					Comp_XML(old_child, new_child, ret_doc, child_element);
 					if (old_node.nodeValue() != new_node.nodeValue()){
 						child_element.setAttribute("modified", "true");
