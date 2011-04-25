@@ -21,7 +21,6 @@ class DiffWidget : public QDialog
 
 	public slots:
 		void applyButtonPressed();
-		void cancelButtonPressed();
 
         private slots:
                 void getOldPath();

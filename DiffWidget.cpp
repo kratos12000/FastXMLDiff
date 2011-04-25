@@ -5,7 +5,6 @@
 #include <iostream>
 #include <QFileInfo>
 #include "DiffWidget.h"
-#include "MainWindow.h"
 #include "Parser.h"
 
 DiffWidget::DiffWidget(QWidget *parent) : QDialog(parent)
@@ -49,7 +48,7 @@ DiffWidget::DiffWidget(QWidget *parent) : QDialog(parent)
         connect(okButton, SIGNAL(clicked()),
                 this, SLOT(applyButtonPressed()));
         connect(cancelButton, SIGNAL(clicked()),
-                this, SLOT(cancelButtonPressed()));
+                this, SIGNAL(canceled()));
 
 
                 QHBoxLayout *line1Layout = new QHBoxLayout;
@@ -82,6 +81,7 @@ DiffWidget::DiffWidget(QWidget *parent) : QDialog(parent)
 
 void DiffWidget::enableOkButton(const QString &text)
 {
+	Q_UNUSED(text);
         okButton->setEnabled(!browseLineEditOld->text().isEmpty() && !browseLineEditNew->text().isEmpty());
 }
 
@@ -121,9 +121,4 @@ void DiffWidget::applyButtonPressed()
 		QString("The XML diff file of ") + browseLineEditOld->text() + " and " + browseLineEditNew->text() +
 		 " has been successfully completed.\n The file has been stored as:  " + nameLineEdit->text() + ".");
 	}
-}
-
-void DiffWidget::cancelButtonPressed()
-{
-        emit canceled();
 }
