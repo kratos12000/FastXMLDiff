@@ -75,19 +75,6 @@ void Parser::Comp_XML(QDomNode old_node, QDomNode new_node, QDomDocument ret_doc
 	qDebug() << "Comparing " << old_node.nodeName() << ":" << old_node.nodeValue() << " and " << new_node.nodeName() << ":" 
 		<< new_node.nodeValue() << endl;
 
-	int old_num_attrs, new_num_attrs, max_num_attrs;
-	old_num_attrs = old_node.attributes().length();
-	new_num_attrs = new_node.attributes().length();
-
-	if (old_num_attrs < new_num_attrs)
-		max_num_attrs = new_num_attrs;
-	else
-		max_num_attrs = old_num_attrs;
-
-	for (int i=0; i < max_num_attrs; i++){
-		//TODO: Attribute comparison like element comparision below.	
-	}
-
 	for (int i=0; i < max_length; i++){
 		QDomNode child_node;
 
@@ -214,23 +201,28 @@ void Parser::Comp_XML(QDomNode old_node, QDomNode new_node, QDomDocument ret_doc
 				QDomElement old_element = old_child.toElement();
 				QDomElement new_element = new_child.toElement();
 				QDomElement child_element;
-				
-				if (old_element.tagName() == new_element.tagName()){
-					child_node = ret_doc.createElement(old_element.tagName());
-
-					child_element = child_node.toElement();
-					Comp_XML(old_child, new_child, ret_doc, child_element);
-					if (old_node.nodeValue() != new_node.nodeValue()){
-						child_element.setAttribute("modified", "true");
-					}
-				}
-				else{
+		
+				if (old_element.tagName() != new_element.tagName() || (old_element.attributes() != new_element.attributes()) ){
 					child_node = ret_doc.createElement("container-node");
 					child_element = child_node.toElement();
 					child_element.appendChild(old_child);
 					child_element.appendChild(new_child);
 					child_element.setAttribute("modified", "true");
 				}
+				else {
+					child_node = ret_doc.createElement(old_element.tagName());
+					child_element = child_node.toElement();
+					QDomNamedNodeMap attributes = old_element.attributes();
+					for (unsigned int i=0;i<attributes.length();i++){
+						QDomAttr attribute = attributes.item(i).toAttr();
+						child_element.setAttribute(attribute.name(), attribute.value());
+					}
+					Comp_XML(old_child, new_child, ret_doc, child_element);
+					if (old_node.nodeValue() != new_node.nodeValue()){
+						child_element.setAttribute("modified", "true");
+					}
+				}
+
 				ret_node.appendChild(child_element);
 			}
 		}
