@@ -260,10 +260,8 @@ void Parser::Comp_XML(const QDomNode old_node, const QDomNode new_node, QDomDocu
 					child_element = child_node.toElement();
 					for (unsigned int i=0;i<max_num_attrs;i++){
 						QDomAttr attribute;
-						if (i < old_num_attrs){
-							attribute = old_attrs.item(i).toAttr();
-						}
-						else{
+						attribute = old_attrs.item(i).toAttr();
+						if (attribute.isNull()){
 							attribute = new_attrs.item(i).toAttr();
 						}
 						child_element.setAttribute(attribute.name(), attribute.value());

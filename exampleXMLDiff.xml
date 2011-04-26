@@ -1,0 +1,29 @@
+<root>
+<?xml version='1.0' encoding='UTF-8'?>
+ <office:document-content>
+  <office:automatic-styles>
+   <style:style>
+    <style:paragraph-properties/>
+    <style:text-properties/>
+   </style:style>
+  </office:automatic-styles>
+  <office:body>
+   <office:text>
+    <text:tracked-changes/>
+    <text:page-sequence>
+     <text:page/>
+    </text:page-sequence>
+    <text:p>
+     <entity-conflict modified="true">
+      <old-text>This is an example document.</old-text>
+      <new-text>This is another example document with some changes to attributes and some comments.</new-text>
+     </entity-conflict>
+    </text:p>
+    <container added="true">
+     <!-- This is a comment! -->
+    </container>
+   </office:text>
+  </office:body>
+ </office:document-content>
+</root>
+
