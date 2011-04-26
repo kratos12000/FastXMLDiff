@@ -71,9 +71,10 @@ void Parser::Comp_XML(QDomNode old_node, QDomNode new_node, QDomDocument ret_doc
 		max_length = new_length;
 	else
 		max_length = old_length;
-
+	
 	qDebug() << "Comparing " << old_node.nodeName() << ":" << old_node.nodeValue() << " and " << new_node.nodeName() << ":" 
 		<< new_node.nodeValue() << endl;
+
 
 	for (int i=0; i < max_length; i++){
 		QDomNode child_node;
@@ -196,13 +197,28 @@ void Parser::Comp_XML(QDomNode old_node, QDomNode new_node, QDomDocument ret_doc
 					ret_node.appendChild(old_child.cloneNode(true));
 			
 			}
-			else
+			else //The nodes are elements
 			{
 				QDomElement old_element = old_child.toElement();
 				QDomElement new_element = new_child.toElement();
 				QDomElement child_element;
-		
-				if (old_element.tagName() != new_element.tagName() || (old_element.attributes() != new_element.attributes()) ){
+
+				QDomAttr old_attr;
+				QDomAttr new_attr;
+
+				QDomNamedNodeMap old_attrs = old_element.attributes();
+				QDomNamedNodeMap new_attrs = new_element.attributes();
+
+				bool AttributeDiff = false;
+
+				for (int i=0;i<old_attrs.count();i++){
+					if (old_attrs.item(i) != new_attrs.item(i)){
+						AttributeDiff = true;
+					}	
+				}
+
+				if (old_element.tagName() != new_element.tagName() || AttributeDiff ){
+					qDebug() << "Old Tag: " << old_element.tagName() << " New Tag: " << new_element.tagName() << endl;
 					child_node = ret_doc.createElement("container-node");
 					child_element = child_node.toElement();
 					child_element.appendChild(old_child);
