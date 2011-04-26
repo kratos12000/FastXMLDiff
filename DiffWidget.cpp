@@ -7,9 +7,28 @@
 #include "DiffWidget.h"
 #include "Parser.h"
 
+DiffWidget::DiffWidget(QString fname1, QString fname2, QString output, QWidget *parent) : QDialog(parent)
+{
+	init();
+	browseLineEditOld->setText(fname1);
+	browseLineEditNew->setText(fname2);
+	nameLineEdit->setText(output);
+}
+
+DiffWidget::DiffWidget(QString fname1, QString fname2, QWidget *parent) : QDialog(parent)
+{
+	init();
+	browseLineEditOld->setText(fname1);
+	browseLineEditNew->setText(fname2);
+}
+
 DiffWidget::DiffWidget(QWidget *parent) : QDialog(parent)
 {
+	init();
+}
 
+void DiffWidget::init()
+{
         nameLabel = new QLabel(tr("Output File Name:"));
         nameLineEdit = new QLineEdit;
         nameLabel->setBuddy(nameLineEdit);

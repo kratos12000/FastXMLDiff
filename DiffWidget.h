@@ -15,6 +15,8 @@ class DiffWidget : public QDialog
 
         public:
                 DiffWidget(QWidget *parent = 0);
+                DiffWidget(QString fname1, QString fname2, QWidget *parent = 0);
+                DiffWidget(QString fname1, QString fname2, QString output, QWidget *parent = 0);
 
         signals:
 		void canceled();
@@ -39,6 +41,8 @@ class DiffWidget : public QDialog
                 QPushButton *okButton;
 		QPushButton *cancelButton;
 		Parser*	m_parser;
+
+		void init();
 };
 
 #endif
