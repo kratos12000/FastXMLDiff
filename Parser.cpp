@@ -54,7 +54,7 @@ int Parser::Read_XML(QString old_path, QString new_path, QString filePath)
 	return 1;	
 }
 
-void Parser::Comp_XML(QDomNode old_node, QDomNode new_node, QDomDocument ret_doc, QDomNode ret_node)
+void Parser::Comp_XML(const QDomNode old_node, const QDomNode new_node, QDomDocument ret_doc, QDomNode ret_node)
 {
 /*
 	QTextStream myStream(stdout);
